@@ -8,4 +8,4 @@ class DimShoppingMall(Base):
   id = Column(Integer, primary_key=True)
   name = Column(String)
 
-  invoices = relationship("FactInvoice", back_populates="dim_shopping_mall", cascade="all, delete")
+  invoices = relationship("FactInvoice", back_populates="shopping_mall", cascade="all, delete")

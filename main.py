@@ -6,6 +6,7 @@ from models.dim_date import DimDate
 from models.dim_payment_method import DimPaymentMethod
 from models.dim_shopping_mall import DimShoppingMall
 from models.fact_invoice import FactInvoice
+from utils.load_data import load_db
 
 def main():
   # crear las tablas en la base de datos
@@ -25,6 +26,9 @@ def main():
   except Exception as e:
     print(e)
     print("Conexión fallida")
+
+  # cargar los datos en las tablas
+  load_db(db)
 
 if __name__ == "__main__":
   main()

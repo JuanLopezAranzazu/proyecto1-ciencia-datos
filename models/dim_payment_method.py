@@ -8,4 +8,4 @@ class DimPaymentMethod(Base):
   id = Column(Integer, primary_key=True)
   name = Column(String)
 
-  invoices = relationship("FactInvoice", back_populates="dim_payment_method", cascade="all, delete")
+  invoices = relationship("FactInvoice", back_populates="payment_method", cascade="all, delete")

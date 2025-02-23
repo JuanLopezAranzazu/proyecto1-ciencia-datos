@@ -8,4 +8,4 @@ class DimCategory(Base):
   id = Column(Integer, primary_key=True)
   name = Column(String)
 
-  invoices = relationship("FactInvoice", back_populates="dim_category", cascade="all, delete")
+  invoices = relationship("FactInvoice", back_populates="category", cascade="all, delete")

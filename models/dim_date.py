@@ -12,4 +12,4 @@ class DimDate(Base):
   year = Column(Integer)
   day_of_week = Column(Integer)
 
-  invoices = relationship("FactInvoice", back_populates="dim_date", cascade="all, delete")
+  invoices = relationship("FactInvoice", back_populates="date", cascade="all, delete")
