@@ -7,6 +7,7 @@ from models.dim_payment_method import DimPaymentMethod
 from models.dim_shopping_mall import DimShoppingMall
 from models.fact_invoice import FactInvoice
 from utils.load_data import load_db
+from utils.create_graphs import generate_graphs
 
 def main():
   # crear las tablas en la base de datos
@@ -29,6 +30,9 @@ def main():
 
   # cargar los datos en las tablas
   load_db(db)
+
+  # generar gráficas de los datos
+  generate_graphs(db)
 
 if __name__ == "__main__":
   main()
