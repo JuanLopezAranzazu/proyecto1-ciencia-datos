@@ -129,7 +129,11 @@ def plot_sales_by_month(db):
   plt.xlabel("Mes")
   plt.ylabel("Ventas totales")
   plt.title("Ventas totales por mes")
-  plt.xticks(range(1, 13))
+  plt.xticks(
+    range(1, 13),
+    ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
+    rotation=45
+  )
   plt.ticklabel_format(style="plain", axis="y")
   plt.gca().yaxis.set_major_formatter(plt.FuncFormatter(lambda x, loc: "{:,}".format(int(x))))
   plt.tight_layout()
