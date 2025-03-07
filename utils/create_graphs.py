@@ -2,7 +2,7 @@ import os
 import pandas as pd
 from sqlalchemy.sql import func
 import matplotlib.pyplot as plt
-from models.dim_category import DimCategory
+from models.dim_product import DimProduct
 from models.dim_customer import DimCustomer
 from models.dim_date import DimDate
 from models.dim_payment_method import DimPaymentMethod
@@ -17,12 +17,12 @@ def plot_sales_by_category(db):
   # obtener datos
   results = (
     db.query(
-      DimCategory.name,
-      func.sum(FactInvoice.price).label("total_sales")
+      DimProduct.name,
+      func.sum(FactInvoice.total_price).label("total_sales")
     )
-    .join(FactInvoice, DimCategory.id == FactInvoice.category_id)
-    .group_by(DimCategory.name)
-    .order_by(func.sum(FactInvoice.price).desc())
+    .join(FactInvoice, DimProduct.id == FactInvoice.product_id)
+    .group_by(DimProduct.name)
+    .order_by(func.sum(FactInvoice.total_price).desc())
     .all()
   )
 
@@ -79,11 +79,11 @@ def plot_sales_by_payment_method(db):
   results = (
     db.query(
       DimPaymentMethod.name,
-      func.sum(FactInvoice.price).label("total_sales")
+      func.sum(FactInvoice.total_price).label("total_sales")
     )
     .join(FactInvoice, DimPaymentMethod.id == FactInvoice.payment_method_id)
     .group_by(DimPaymentMethod.name)
-    .order_by(func.sum(FactInvoice.price).desc())
+    .order_by(func.sum(FactInvoice.total_price).desc())
     .all()
   )
 
@@ -112,7 +112,7 @@ def plot_sales_by_month(db):
   results = (
     db.query(
       DimDate.month,
-      func.sum(FactInvoice.price).label("total_sales")
+      func.sum(FactInvoice.total_price).label("total_sales")
     )
     .join(FactInvoice, DimDate.id == FactInvoice.date_id)
     .group_by(DimDate.month)
@@ -149,7 +149,7 @@ def plot_sales_by_day_of_week(db):
   results = (
     db.query(
       DimDate.day_of_week,
-      func.sum(FactInvoice.price).label("total_sales")
+      func.sum(FactInvoice.total_price).label("total_sales")
     )
     .join(FactInvoice, DimDate.id == FactInvoice.date_id)
     .group_by(DimDate.day_of_week)
@@ -210,11 +210,11 @@ def plot_sales_by_shopping_mall(db):
   results = (
     db.query(
       DimShoppingMall.name,
-      func.sum(FactInvoice.price).label("total_sales")
+      func.sum(FactInvoice.total_price).label("total_sales")
     )
     .join(FactInvoice, DimShoppingMall.id == FactInvoice.shopping_mall_id)
     .group_by(DimShoppingMall.name)
-    .order_by(func.sum(FactInvoice.price).desc())
+    .order_by(func.sum(FactInvoice.total_price).desc())
     .all()
   )
 
@@ -236,6 +236,34 @@ def plot_sales_by_shopping_mall(db):
   plt.savefig(os.path.join(graphs_dir, "sales_by_shopping_mall.png"))
   plt.close()
 
+
+# total de ventas por genero
+def plot_sales_by_gender(db):
+  # obtener datos
+  results = (
+    db.query(
+      DimCustomer.gender,
+      func.sum(FactInvoice.total_price).label("total_sales")
+    )
+    .join(FactInvoice, DimCustomer.id == FactInvoice.customer_id)
+    .group_by(DimCustomer.gender)
+    .all()
+  )
+
+  # crear dataframe
+  df = pd.DataFrame(results, columns=["gender", "total_sales"])
+
+  # generar gráfica
+  plt.figure(figsize=(10, 7))
+  plt.pie(df["total_sales"], labels=df["gender"], autopct='%1.1f%%', startangle=140)
+  plt.title("Ventas totales por género")
+  plt.axis('equal') 
+
+  # guardar gráfica
+  plt.savefig(os.path.join(graphs_dir, "sales_by_gender.png"))
+  plt.close()
+
+
 # generar gráficas de los datos
 def generate_graphs(db):
   # crear directorio si no existe
@@ -250,5 +278,6 @@ def generate_graphs(db):
   plot_sales_by_day_of_week(db)
   plot_sales_by_shopping_mall(db)
   plot_popular_shopping_malls(db)
+  plot_sales_by_gender(db)
 
   print("Gráficas generadas con éxito!")

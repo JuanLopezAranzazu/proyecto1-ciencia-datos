@@ -1,6 +1,6 @@
 from db.database import engine, Base, SessionLocal
 from sqlalchemy.sql import text
-from models.dim_category import DimCategory
+from models.dim_product import DimProduct
 from models.dim_customer import DimCustomer
 from models.dim_date import DimDate
 from models.dim_payment_method import DimPaymentMethod
@@ -30,7 +30,6 @@ def main():
 
   # cargar los datos en las tablas
   load_db(db)
-
   # generar gráficas de los datos
   generate_graphs(db)
 

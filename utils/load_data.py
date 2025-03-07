@@ -1,5 +1,5 @@
 import pandas as pd
-from models.dim_category import DimCategory
+from models.dim_product import DimProduct
 from models.dim_customer import DimCustomer
 from models.dim_date import DimDate
 from models.dim_payment_method import DimPaymentMethod
@@ -13,11 +13,19 @@ csv_file = "./data/customer_shopping_data.csv"
 def load_data(file_path):
   return pd.read_csv(file_path)
 
-# cargar datos de categorias
-def insert_categories(db, dataFrame):
-  if db.query(DimCategory).count() == 0:
-    categories = [{"name": category} for category in dataFrame["category"].unique()]
-    db.bulk_insert_mappings(DimCategory, categories)
+# cargar datos de productos
+def insert_products(db, dataFrame):
+  if db.query(DimProduct).count() == 0:
+    # obtener productos únicos
+    unique_products = dataFrame[['category', 'price']].drop_duplicates()
+    products = [
+      {
+        "name": row["category"],
+        "price": row["price"]
+      }
+      for _, row in unique_products.iterrows()
+    ]
+    db.bulk_insert_mappings(DimProduct, products)
 
 # cargar datos de metodos de pago
 def insert_payment_methods(db, dataFrame):
@@ -66,11 +74,14 @@ def insert_customers(db, dataFrame):
 def insert_invoices(db, dataFrame):
   if db.query(FactInvoice).count() == 0:
     # mapear los IDs de las tablas relacionadas
-    category_map = {c.name: c.id for c in db.query(DimCategory).all()}
+    product_map = {p.name: p.id for p in db.query(DimProduct).all()}
     payment_map = {p.name: p.id for p in db.query(DimPaymentMethod).all()}
     mall_map = {m.name: m.id for m in db.query(DimShoppingMall).all()}
     customer_map = {c.id: c.id for c in db.query(DimCustomer).all()}
     date_map = {d.full_date: d.id for d in db.query(DimDate).all()}
+
+    # crear una nueva columna con el total de la factura
+    dataFrame["total_price"] = dataFrame["price"] * dataFrame["quantity"]
 
     # transformar la columna invoice_date a tipo fecha
     dataFrame['invoice_date'] = pd.to_datetime(dataFrame['invoice_date'], dayfirst=True)
@@ -79,12 +90,12 @@ def insert_invoices(db, dataFrame):
       {
         "id": row["invoice_no"],
         "customer_id": customer_map[row["customer_id"]],
-        "category_id": category_map[row["category"]],
+        "product_id": product_map[row["category"]],
         "payment_method_id": payment_map[row["payment_method"]],
         "shopping_mall_id": mall_map[row["shopping_mall"]],
         "date_id": date_map[row["invoice_date"].date()],
-        "price": row["price"],
-        "quantity": row["quantity"]
+        "quantity": row["quantity"],
+        "total_price": row["total_price"]
       }
       for _, row in dataFrame.iterrows()
     ]
@@ -95,7 +106,7 @@ def load_db(db):
   dataFrame = load_data(csv_file)
    
   try:
-    insert_categories(db, dataFrame)
+    insert_products(db, dataFrame)
     insert_payment_methods(db, dataFrame)
     insert_shopping_malls(db, dataFrame)
     insert_customers(db, dataFrame)

@@ -11,9 +11,10 @@ CREATE TABLE IF NOT EXISTS dim_customer  (
   age INT
 );
 
-CREATE TABLE IF NOT EXISTS dim_category  (
+CREATE TABLE IF NOT EXISTS dim_product  (
   id SERIAL PRIMARY KEY,
-  name VARCHAR
+  name VARCHAR,
+  price DECIMAL(10, 2)
 );
 
 CREATE TABLE IF NOT EXISTS dim_payment_method  (
@@ -40,14 +41,14 @@ CREATE TABLE IF NOT EXISTS dim_date  (
 CREATE TABLE IF NOT EXISTS fact_invoice  (
   id VARCHAR PRIMARY KEY,
   customer_id VARCHAR,
-  category_id INT,
+  product_id INT,
   payment_method_id INT,
   shopping_mall_id INT,
   date_id INT,
-  price DECIMAL(10, 2),
   quantity INT,
+  total_price DECIMAL(10, 2),
   FOREIGN KEY (customer_id) REFERENCES dim_customer(id),
-  FOREIGN KEY (category_id) REFERENCES dim_category(id),
+  FOREIGN KEY (product_id) REFERENCES dim_product(id),
   FOREIGN KEY (payment_method_id) REFERENCES dim_payment_method(id),
   FOREIGN KEY (shopping_mall_id) REFERENCES dim_shopping_mall(id),
   FOREIGN KEY (date_id) REFERENCES dim_date(id)
