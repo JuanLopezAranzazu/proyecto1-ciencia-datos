@@ -7,6 +7,7 @@ class FactInvoice(Base):
 
   id = Column(String, primary_key=True)
   quantity = Column(Integer) # cantidad del producto
+  unit_price = Column(Float) # precio unitario del producto
   total_price = Column(Float) # precio total de la compra
   customer_id = Column(String, ForeignKey("dim_customer.id")) # id del cliente
   product_id = Column(Integer, ForeignKey("dim_product.id")) # id del producto

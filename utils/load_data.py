@@ -17,14 +17,7 @@ def load_data(file_path):
 def insert_products(db, dataFrame):
   if db.query(DimProduct).count() == 0:
     # obtener productos únicos
-    unique_products = dataFrame[['category', 'price']].drop_duplicates()
-    products = [
-      {
-        "name": row["category"],
-        "price": row["price"]
-      }
-      for _, row in unique_products.iterrows()
-    ]
+    products = [{"name": product} for product in dataFrame["category"].unique()]
     db.bulk_insert_mappings(DimProduct, products)
 
 # cargar datos de metodos de pago
@@ -95,6 +88,7 @@ def insert_invoices(db, dataFrame):
         "shopping_mall_id": mall_map[row["shopping_mall"]],
         "date_id": date_map[row["invoice_date"].date()],
         "quantity": row["quantity"],
+        "unit_price": row["price"],
         "total_price": row["total_price"]
       }
       for _, row in dataFrame.iterrows()
